@@ -21,9 +21,18 @@
  * This TipTip jQuery plug-in is dual licensed under the MIT and GPL licenses:
  *   http://www.opensource.org/licenses/mit-license.php
  *   http://www.gnu.org/licenses/gpl.html
+ *
+ *
+<div class="TipTip TipTip--top TipTip--theme-white">
+	<div class="TipTip__arrow">
+		<div class="TipTip__pointer"></div>
+	</div>
+	<div class="TipTip__content">Содержимое Типа</div>
+</div>
+ *
  */
 
-#tiptip_holder {
+.TipTip {
 	display: none;
 	left: 0;
 	position: absolute;
@@ -31,23 +40,14 @@
 	z-index: 9999;
 }
 
-#tiptip_holder.tip_top {
-	padding-bottom: 5px;
-}
+/*
+.TipTip--top { padding-bottom: 5px; }
+.TipTip--bottom { padding-top: 5px; }
+*/
+.TipTip--right { padding-left: 5px; }
+.TipTip--left { padding-right: 5px; }
 
-#tiptip_holder.tip_bottom {
-	padding-top: 5px;
-}
-
-#tiptip_holder.tip_right {
-	padding-left: 5px;
-}
-
-#tiptip_holder.tip_left {
-	padding-right: 5px;
-}
-
-#tiptip_content {
+.TipTip__content {
 	-webkit-box-sizing: border-box;
 	   -moz-box-sizing: border-box;
 	        box-sizing: border-box;
@@ -60,25 +60,86 @@
 	padding: 4px 8px;
 }
 
-#tiptip_arrow,
-#tiptip_arrow_inner {
+.TipTip__arrow,
+.TipTip__pointer {
 	height: 0;
 	position: absolute;
 	width: 0;
 }
 
+.TipTip__donor {
+	left: -9999px !important;
+	position: absolute !important;
+	top: -9999px !important;
+	visibility: hidden !important;
+}
 
-#tiptip_holder.tip_top #tiptip_arrow_inner {
+
+.TipTip--top .TipTip__pointer {
 	margin-top: -7px;
 	margin-left: -6px;
 }
 
 
 
-/* DEFAULT BLACK THEME
+/* DEFAULT WHITE THEME
 -----------------------------------------------------------------*/
 
-#tiptip_holder.tip--theme-black #tiptip_content {
+.TipTip.TipTip--theme-white .TipTip__pointer {
+	background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAASAgMAAAA8gvYNAAAADFBMVEUAAAD///+zs7PS0tJZ+3BbAAAAAXRSTlMAQObYZgAAAFFJREFUCNc1jbENgDAQA090EDEK41h0ESNQUjIKS2QU+owSF4700kv22YZduoEidWD5zxc6rVJ4OHxUto+GDdsYM4wuWOeLGCSBxFOW6gxldgDJFRuLVvEsPQAAAABJRU5ErkJggg==') no-repeat;
+}
+
+.TipTip--top.TipTip--theme-white .TipTip__pointer,
+.TipTip--bottom.TipTip--theme-white .TipTip__pointer {
+	border: 0;
+	height: 6px;
+	margin-left: 0;
+	width: 12px;
+}
+.TipTip--top.TipTip--theme-white .TipTip__pointer {
+	background-position: -6px 0;
+	margin-top: -1px;
+}
+.TipTip--bottom.TipTip--theme-white .TipTip__pointer {
+	background-position: -6px 100%;
+	height: 8px;
+	margin-top: 5px;
+}
+
+.TipTip--right.TipTip--theme-white .TipTip__pointer,
+.TipTip--left.TipTip--theme-white .TipTip__pointer {
+	border: 0;
+	height: 12px;
+	width: 6px;
+}
+.TipTip--right.TipTip--theme-white .TipTip__pointer {
+	background-position: 100% -3px;
+	margin-left: 12px;
+}
+.TipTip--left.TipTip--theme-white .TipTip__pointer {
+	background-position: 0 -3px;
+	margin-left: -1px;
+}
+
+.TipTip.TipTip--theme-white .TipTip__content {
+	background-color: #fafafa;
+	background-color: rgba(245,245,245,.97);
+	background-image: -webkit-linear-gradient(#fff, #fafafa);
+	background-image:      -o-linear-gradient(#fff, #fafafa);
+	background-image:         linear-gradient(#fff, #fafafa);
+	-webkit-box-shadow: 0 7px 12px rgba(0,0,0,.15);
+	        box-shadow: 0 7px 12px rgba(0,0,0,.15);
+	border: 1px solid #b3b3b3;
+	color: #000;
+}
+
+
+
+
+/* BLACK THEME
+-----------------------------------------------------------------*/
+
+.TipTip.TipTip--theme-black .TipTip__content {
 	background-color: rgb(25,25,25);
 	background-color: rgba(25,25,25,.92);
 	background-image: -webkit-linear-gradient(transparent, #000);
@@ -89,45 +150,45 @@
 	text-shadow: 0 0 2px #000;
 }
 
-#tiptip_holder.tip--theme-black #tiptip_arrow,
-#tiptip_holder.tip--theme-black #tiptip_arrow_inner {
+.TipTip.TipTip--theme-black .TipTip__arrow,
+.TipTip.TipTip--theme-black .TipTip__pointer {
 	border: 6px solid transparent;
 }
 
-#tiptip_holder.tip_top.tip--theme-black #tiptip_arrow {
+.TipTip--top.TipTip--theme-black .TipTip__arrow {
 	border-top-color: #fff;
 	border-top-color: rgba(255,255,255,.35);
 }
-#tiptip_holder.tip_bottom.tip--theme-black #tiptip_arrow {
+.TipTip--bottom.TipTip--theme-black .TipTip__arrow {
 	border-bottom-color: #fff;
 	border-bottom-color: rgba(255,255,255,.35);
 }
-#tiptip_holder.tip_right.tip--theme-black #tiptip_arrow {
+.TipTip--right.TipTip--theme-black .TipTip__arrow {
 	border-right-color: #fff;
 	border-right-color: rgba(255,255,255,.35);
 }
-#tiptip_holder.tip_left.tip--theme-black #tiptip_arrow {
+.TipTip--left.TipTip--theme-black .TipTip__arrow {
 	border-left-color: #fff;
 	border-left-color: rgba(255,255,255,.35);
 }
 
-#tiptip_holder.tip_top.tip--theme-black #tiptip_arrow_inner {
+.TipTip--top.TipTip--theme-black .TipTip__pointer {
 	border-top-color: rgb(25,25,25);
 	border-top-color: rgba(25,25,25,.92);
 }
-#tiptip_holder.tip_bottom.tip--theme-black #tiptip_arrow_inner {
+.TipTip--bottom.TipTip--theme-black .TipTip__pointer {
 	border-bottom-color: rgb(25,25,25);
 	border-bottom-color: rgba(25,25,25,.92);
-	margin-top: -5px;
+	margin-top: -6px;
 	margin-left: -6px;
 }
-#tiptip_holder.tip_right.tip--theme-black #tiptip_arrow_inner {
+.TipTip--right.TipTip--theme-black .TipTip__pointer {
 	border-right-color: rgb(25,25,25);
 	border-right-color: rgba(25,25,25,.92);
 	margin-top: -6px;
 	margin-left: -5px;
 }
-#tiptip_holder.tip_left.tip--theme-black #tiptip_arrow_inner {
+.TipTip--left.TipTip--theme-black .TipTip__pointer {
 	border-left-color: rgb(25,25,25);
 	border-left-color: rgba(25,25,25,.92);
 	margin-top: -6px;
@@ -136,14 +197,14 @@
 
 /* Webkit Hacks  */
 @media screen and (-webkit-min-device-pixel-ratio:0) {	
-	#tiptip_holder.tip--theme-black #tiptip_content {
+	.TipTip.TipTip--theme-black .TipTip__content {
 		background-color: rgba(45,45,45,.88);
 		padding: 4px 8px 5px;
 	}
-	#tiptip_holder.tip_bottom.tip--theme-black #tiptip_arrow_inner { 
+	.TipTip--bottom.TipTip--theme-black .TipTip__pointer { 
 		border-bottom-color: rgba(45,45,45,.88);
 	}
-	#tiptip_holder.tip_top.tip--theme-black #tiptip_arrow_inner { 
+	.TipTip--top.TipTip--theme-black .TipTip__pointer { 
 		border-top-color: rgba(20,20,20,.92);
 	}
 }
@@ -153,27 +214,27 @@
 /* ALT THEME
 -----------------------------------------------------------------*/
 
-#tiptip_holder.tip--theme-alt.tip_top #tiptip_arrow_inner {
+.TipTip--top.TipTip--theme-alt .TipTip__pointer {
 	border-top-color: #444;
 }
-#tiptip_holder.tip--theme-alt.tip_bottom #tiptip_arrow_inner {
+.TipTip--bottom.TipTip--theme-alt .TipTip__pointer {
 	border-bottom-color: #444;
 }
-#tiptip_holder.tip--theme-alt.tip_right #tiptip_arrow_inner {
+.TipTip--right.TipTip--theme-alt .TipTip__pointer {
 	border-right-color: #444;	
 }
-#tiptip_holder.tip--theme-alt.tip_left #tiptip_arrow_inner {
+.TipTip--left.TipTip--theme-alt .TipTip__pointer {
 	border-left-color: #444;
 }
 
-#tiptip_holder.tip_top #tiptip_arrow,
-#tiptip_holder.tip_right #tiptip_arrow,
-#tiptip_holder.tip_bottom #tiptip_arrow,
-#tiptip_holder.tip_left #tiptip_arrow {
+.TipTip--top .TipTip__arrow,
+.TipTip--right .TipTip__arrow,
+.TipTip--bottom .TipTip__arrow,
+.TipTip--left .TipTip__arrow {
 	border-color: transparent;
 }
 
-#tiptip_holder.tip--theme-alt #tiptip_content {
+.TipTip.TipTip--theme-alt .TipTip__content {
 	background-color: #444;
 	border: 1px solid #fff;
 	border-radius: 3px;
@@ -186,64 +247,9 @@
 }
 
 /*corner tips*/
-#tiptip_holder.tip_left_top #tiptip_arrow,
-#tiptip_holder.tip_right_top #tiptip_arrow,
-#tiptip_holder.tip_left_bottom #tiptip_arrow,
-#tiptip_holder.tip_right_bottom #tiptip_arrow {
+.TipTip--left-top .TipTip__arrow,
+.TipTip--right-top .TipTip__arrow,
+.TipTip--left-bottom .TipTip__arrow,
+.TipTip--right-bottom .TipTip__arrow {
 	display: none;
-}
-
-
-
-/* WHITE THEME
------------------------------------------------------------------*/
-
-#tiptip_holder.tip--theme-white #tiptip_arrow_inner {
-	background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAASAgMAAAA8gvYNAAAADFBMVEUAAAD///+zs7PS0tJZ+3BbAAAAAXRSTlMAQObYZgAAAFFJREFUCNc1jbENgDAQA090EDEK41h0ESNQUjIKS2QU+owSF4700kv22YZduoEidWD5zxc6rVJ4OHxUto+GDdsYM4wuWOeLGCSBxFOW6gxldgDJFRuLVvEsPQAAAABJRU5ErkJggg==') no-repeat;
-}
-
-#tiptip_holder.tip_top.tip--theme-white #tiptip_arrow {
-	border-top-color: rgba(25,25,25,.35);
-	bottom: -6px;
-}
-
-#tiptip_holder.tip_top.tip--theme-white #tiptip_arrow_inner,
-#tiptip_holder.tip_bottom.tip--theme-white #tiptip_arrow_inner {
-	border: 0;
-	height: 6px;
-	margin-top: -1px;
-	margin-left: 0;
-	width: 12px;
-}
-#tiptip_holder.tip_top.tip--theme-white #tiptip_arrow_inner {
-	background-position: -6px 0;
-}
-#tiptip_holder.tip_bottom.tip--theme-white #tiptip_arrow_inner {
-	background-position: -6px -12px;
-}
-
-#tiptip_holder.tip_right.tip--theme-white #tiptip_arrow_inner,
-#tiptip_holder.tip_left.tip--theme-white #tiptip_arrow_inner {
-	border: 0;
-	height: 12px;
-	width: 6px;
-}
-#tiptip_holder.tip_right.tip--theme-white #tiptip_arrow_inner {
-	background-position: -18px -3px;
-}
-#tiptip_holder.tip_left.tip--theme-white #tiptip_arrow_inner {
-	background-position: 0 -3px;
-	left: -1px;
-}
-
-#tiptip_holder.tip--theme-white #tiptip_content {
-	background-color: #fafafa;
-	background-color: rgba(245,245,245,.97);
-	background-image: -webkit-linear-gradient(#fff, #fafafa);
-	background-image:      -o-linear-gradient(#fff, #fafafa);
-	background-image:         linear-gradient(#fff, #fafafa);
-	-webkit-box-shadow: 0 7px 12px rgba(0,0,0,.15);
-	        box-shadow: 0 7px 12px rgba(0,0,0,.15);
-	border: 1px solid #b3b3b3;
-	color: #000;
 }
