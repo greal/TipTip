@@ -7,17 +7,9 @@
  * Modified by: indyone (https://github.com/indyone/TipTip)
  * Modified by: Jonathan Lim-Breitbart (https://github.com/breity/TipTip) - Updated: Oct. 10, 2012
  * Modified by: Alan Hussey/EnergySavvy (https://github.com/EnergySavvy/TipTip) - Updated: Mar. 18, 2013
- * Modified by: Sergei Vasilev (https://github.com/Ser-Gen/TipTip) - Updated: Mar 03, 2015
+ * Modified by: Sergei Vasilev (https://github.com/Ser-Gen/TipTip) - Updated: Mar 04, 2015
  *
- * Version 1.4.1   -   Updated: Mar 03, 2015
- *
- * This Plug-In will create a custom tooltip to replace the default
- * browser tooltip. It is extremely lightweight and very smart in
- * that it detects the edges of the browser window and will make sure
- * the tooltip stays within the current window size. As a result the
- * tooltip will adjust itself to be displayed above, below, to the left
- * or to the right depending on what is necessary to stay within the
- * browser window. It is completely customizable as well via CSS.
+ * Version 1.4.1   -   Updated: Mar 04, 2015
  *
  * This TipTip jQuery plug-in is dual licensed under the MIT and GPL licenses:
  *   http://www.opensource.org/licenses/mit-license.php
