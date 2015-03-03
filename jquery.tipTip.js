@@ -7,8 +7,9 @@
  * Modified by: indyone (https://github.com/indyone/TipTip)
  * Modified by: Jonathan Lim-Breitbart (https://github.com/breity/TipTip) - Updated: Oct. 10, 2012
  * Modified by: Alan Hussey/EnergySavvy (https://github.com/EnergySavvy/TipTip) - Updated: Mar. 18, 2013
+ * Modified by: Sergei Vasilev (https://github.com/Ser-Gen/TipTip) - Updated: Mar 03, 2015
  *
- * Version 1.3   -   Updated: Mar. 23, 2010
+ * Version 1.4.1   -   Updated: Mar 03, 2015
  *
  * This Plug-In will create a custom tooltip to replace the default
  * browser tooltip. It is extremely lightweight and very smart in
@@ -31,7 +32,7 @@
 			hideOnClick: false, // когда `true`, нажатие снаружи Типа закроет его. полезно вместе с `keepAlive` и `delayHide`, например
 			maxWidth: '200px', // максимальная ширина, также может задаваться стилями
 			edgeOffset: 0, // расстояние между стрелкой Типа и родителем
-			defaultPosition: 'top', // положение, может быть `top`, `right`, `bottom`, `left`
+			defaultPosition: 'bottom', // положение, может быть `top`, `right`, `bottom`, `left`
 
 			delay: 100, // задержка перед показом
 			delayHover: 0, // задержка перед показом после наведения
@@ -47,7 +48,7 @@
 			exit: function () { }, // функция перед скрытием
 			afterExit: function () { }, // функция после скрытия
 
-			theme: 'white', // устанавливается тема, выбор из `black`, `alt` и `white`
+			theme: 'black', // устанавливается тема, выбор из `black`, `alt` и `white`
 			cssClass: '', // класс будет добавлен типу перед его отображением
 
 			objActiveClass: 'TipTip__active', // класс-маркер, чтобы облегчить определение родителя активного типа; будет удалён при помощи `deactive_tiptip()`
@@ -117,66 +118,76 @@
 							active_tiptip();
 						};
 					}).on('mouseleave.tipTip', function () {
-							if (timeoutHover){
-								clearTimeout(timeoutHover);
-							};
-							
-							if (!opts.keepAlive) {
+						if (timeoutHover){
+							clearTimeout(timeoutHover);
+						};
+						
+						if (!opts.keepAlive) {
+							deactive_tiptip();
+						} else {
+							data.holder.one('mouseleave.tipTip', function () {
 								deactive_tiptip();
-							} else {
-								data.holder.one('mouseleave.tipTip', function () {
-									deactive_tiptip();
-								});
-							};
-							if (opts.hideOnClick) {
-								deactive_on_click();
-							};
-						});
+							});
+						};
+						if (opts.hideOnClick) {
+							deactive_on_click();
+						};
+					});
 				} else if (opts.activation == 'focus') {
 					obj.on('focus.tipTip', function () {
 						active_tiptip();
 					}).on('blur.tipTip', function () {
-							deactive_tiptip();
-						});
+						deactive_tiptip();
+					});
 				} else if (opts.activation == 'click') {
 					obj.on('click.tipTip', function (e) {
 						e.preventDefault();
+
 						if (!$(this).hasClass(opts.objActiveClass)) {
-							active_tiptip();
+							$('html').trigger('tipTip-check', [$(e.target)]);
+							setImmediate(active_tiptip);
 						} else {
 							deactive_tiptip();
 						};
+						if (opts.hideOnClick) {
+							deactive_on_click();
+						};
+
 						return false;
-					}).on('mouseleave.tipTip', function () {
+					});
+
+					// скрывать Тип, когда пользователь нажимает куда угодно кроме самого Типа
+					$('html').on('tipTip-check', obj, function(e, target) {
+						if (obj.hasClass(opts.objActiveClass) && $.data(obj[0], 'tipTip').holder) {
+							if ($(target).parents('.TipTip').get(0) != $.data(obj[0], 'tipTip').holder.get(0)) {
+								deactive_tiptip();
+							};
+						};
+					});
+
+					// если работа не полностью на нажатиях
+					if (!opts.keepAlive || !opts.hideOnClick) {
+						obj.on('mouseleave.tipTip', function () {
 							if (!opts.keepAlive) {
 								deactive_tiptip();
-							} else {
-								if (opts.hideOnClick) {
-									deactive_on_click();
-								} else {
+							} else if (!opts.hideOnClick) {
 
-									// сейчас данные уже обновились
-									$.data(obj[0], 'tipTip').holder.one('mouseleave.tipTip', function () {
-										deactive_tiptip();
-									});
-								};
+								// сейчас данные уже обновились
+								$.data(obj[0], 'tipTip').holder.one('mouseleave.tipTip', function () {
+									deactive_tiptip();
+								});
 							};
 						});
+					};
 				} else if (opts.activation == 'manual') {
 					// нечего регистрировать, разработчик сам поймёт что, где, когда показывать
 				};
+			};
 				
-				// скрывать Тип, когда пользователь нажимает куда угодно кроме самого Типа
-				function deactive_on_click() {
-					$('html').off('click.tipTip').on('click.tipTip', function(e){
-						if (!$(e.target).closest('.TipTip').length) {
-							$('html').off('click.tipTip');
-
-							 // 0 = мгновенно, игнорируя `delayHide`
-							deactive_tiptip(0);
-						}
-					});
-				};
+			function deactive_on_click() {
+				$('html').off('click.tipTip').on('click.tipTip', function(e) {
+					$('html').trigger('tipTip-check', [$(e.target)]); 
+				});
 			};
 
 			function active_tiptip() {
@@ -270,7 +281,7 @@
 				var delay = (delay !== undefined) ? delay : opts.delayHide;
 
 				if (delay == 0) {
-					hide_tiptip();
+					hide_tiptip(data);
 
 					// если пользователь нажал, убираем отложенное скрытие
 					if (opts.delayHide > 0) {
@@ -302,8 +313,12 @@
 			};
 
 			function hide_tiptip() {
-				$.data(obj[0], 'tipTip').holder.fadeOut(opts.fadeOut, function(){
+				var data = $.data(obj[0], 'tipTip');
+
+				if (data.holder) {
+					data.holder.fadeOut(opts.fadeOut, function(){
 				});
+				};
 			};
 
 			function destroy_tiptip() {
@@ -457,7 +472,8 @@
 				});
 			}
 		});
-	}
+	};
+
 
 	// определяем правосторонность текста
 	var ltrChars = 'A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02B8\u0300-\u0590\u0800-\u1FFF\u2C00-\uFB1C\uFDFE-\uFE6F\uFEFD-\uFFFF',
@@ -467,6 +483,34 @@
 	function isRtlText(text) {
 		return rtlDirCheckRe.test(text);
 	};
+
+
+	// http://learn.javascript.ru/setimmediate
+	if (!window.setImmediate) window.setImmediate = (function() {
+		var head = { }, tail = head; // очередь вызовов, 1-связный список
+		var ID = Math.random(); // уникальный идентификатор
+
+		function onmessage(e) {
+			if(e.data != ID) return; // не наше сообщение
+			head = head.next;
+			var func = head.func;
+			delete head.func;
+			func();
+		};
+
+		if(window.addEventListener) { // IE9+, другие браузеры
+			window.addEventListener('message', onmessage, false);
+		};
+
+		return window.postMessage && window.addEventListener ? function(func) {
+			tail = tail.next = { func: func };
+			window.postMessage(ID, "*");
+		} :
+			function(func) { // IE<=8
+			setTimeout(func, 0);
+		};
+	}());
+
 
 	// по умолчанию обрабатываем элементы со специальным классом
 	$(document).ready(function() {

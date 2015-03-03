@@ -4,5 +4,4 @@
 
 Лицензия двойная: [MIT](http://www.opensource.org/licenses/mit-license.php) и [GPL](http://www.gnu.org/licenses/gpl.html)
 
-Это неоднократно модифицированная версия дополнения, об истории изменений можно почитать в Readme.txt и в описании релиза.
-
+Это неоднократно модифицированная версия дополнения, об истории изменений можно почитать в [англоязычной документации](https://github.com/Ser-Gen/TipTip/blob/master/README.md) и в [описании релизов](https://github.com/Ser-Gen/TipTip/releases).
