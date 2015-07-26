@@ -1,15 +1,10 @@
 /*
  * TipTip CSS
  * Copyright 2010 Drew Wilson
- * www.drewwilson.com
- * code.drewwilson.com/entry/tiptip-jquery-plugin
  *
- * Modified by: indyone (https://github.com/indyone/TipTip)
- * Modified by: Jonathan Lim-Breitbart (https://github.com/breity/TipTip) - Updated: Oct. 10, 2012
- * Modified by: Alan Hussey/EnergySavvy (https://github.com/EnergySavvy/TipTip) - Updated: Mar. 18, 2013
- * Modified by: Sergei Vasilev (https://github.com/Ser-Gen/TipTip) - Updated: Mar 04, 2015
+ * Modified by: Sergei Vasilev (https://github.com/Ser-Gen/TipTip)
  *
- * Version 1.4.1   -   Updated: Mar 04, 2015
+ * Version 1.5.0
  *
  * This TipTip jQuery plug-in is dual licensed under the MIT and GPL licenses:
  *   http://www.opensource.org/licenses/mit-license.php
@@ -57,10 +52,7 @@
 }
 
 .TipTip__donor {
-	left: -9999px !important;
-	position: absolute !important;
-	top: -9999px !important;
-	visibility: hidden !important;
+	display: none !important;
 }
 
 

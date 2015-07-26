@@ -1,15 +1,10 @@
 /*
  * TipTip JS
  * Copyright 2010 Drew Wilson
- * www.drewwilson.com
- * code.drewwilson.com/entry/tiptip-jquery-plugin
  *
- * Modified by: indyone (https://github.com/indyone/TipTip)
- * Modified by: Jonathan Lim-Breitbart (https://github.com/breity/TipTip) - Updated: Oct. 10, 2012
- * Modified by: Alan Hussey/EnergySavvy (https://github.com/EnergySavvy/TipTip) - Updated: Mar. 18, 2013
- * Modified by: Sergei Vasilev (https://github.com/Ser-Gen/TipTip) - Updated: Mar 04, 2015
+ * Modified by: Sergei Vasilev (https://github.com/Ser-Gen/TipTip)
  *
- * Version 1.4.1   -   Updated: Mar 04, 2015
+ * Version 1.5.0
  *
  * This TipTip jQuery plug-in is dual licensed under the MIT and GPL licenses:
  *   http://www.opensource.org/licenses/mit-license.php
@@ -24,7 +19,7 @@
 			hideOnClick: false, // когда `true`, нажатие снаружи Типа закроет его. полезно вместе с `keepAlive` и `delayHide`, например
 			maxWidth: '200px', // максимальная ширина, также может задаваться стилями
 			edgeOffset: 0, // расстояние между стрелкой Типа и родителем
-			defaultPosition: 'bottom', // положение, может быть `top`, `right`, `bottom`, `left`
+			defaultPosition: 'top', // положение, может быть `top`, `right`, `bottom`, `left`
 
 			delay: 100, // задержка перед показом
 			delayHover: 0, // задержка перед показом после наведения
@@ -44,6 +39,8 @@
 			cssClass: '', // класс будет добавлен типу перед его отображением
 
 			objActiveClass: 'TipTip__active', // класс-маркер, чтобы облегчить определение родителя активного типа; будет удалён при помощи `deactive_tiptip()`
+			hideOthers: true, // скрывать ли другие типы при активации
+			container: 'body', // элемент, потенциально прокручиваемый, внутрь которого будет добавляться разметка Типа
 
 			detectTextDir: false // автоматическое определение правостороннего текста, немного замедляет работу
 		};
@@ -57,8 +54,9 @@
 			var opts = data && data.options || $.extend(
 				{},
 				defaults, // по умолчанию
+				window.tipTip || {}, // глобальные
 				options, // переданные при инициализации
-				obj.data('tipTip') || {} // настройки из атрибута, самый большой приоритет
+				obj.data('tipTip') || {} // из атрибута, самый большой приоритет
 			);
 			var timeoutHide = false;
 
@@ -185,8 +183,19 @@
 			function active_tiptip() {
 				var data = $.data(obj[0], 'tipTip');
 
-				if (opts.enter.call(obj, data) === false) {
+				if (opts.enter.call(obj, data) === false || obj.hasClass(opts.objActiveClass)) {
 					return;
+				};
+
+				if (opts.hideOthers) {
+					$('.TipTip--is-active').each(function () {
+						var _tip = $(this);
+						var _obj = _tip.data().tipTip.obj || undefined;
+
+						if (_obj && obj[0] !== _obj[0]) {
+							_obj.tipTip('hide');
+						};
+					});
 				};
 
 				// готовим разметку для Типа, если не готова
@@ -195,14 +204,21 @@
 					var tiptip_arrow = $('<div>', { 'class': 'TipTip__arrow' }).append(tiptip_inner_arrow);
 					var tiptip_content = $('<div>', { 'class': 'TipTip__content' });
 					var tiptip_holder = $('<div>', { 'class': 'TipTip' }).append(tiptip_arrow).append(tiptip_content);
-					$('body').append(tiptip_holder);
+					$(opts.container).append(tiptip_holder);
 
 					data['holder'] = tiptip_holder;
 					data['content'] = tiptip_content;
 					data['arrow'] = tiptip_arrow;
 					$.data(obj[0], 'tipTip', data);
+					$.data(tiptip_holder[0], 'tipTip', {obj: obj});
 
-					$(window).on('resize.tipTip scroll.tipTip', position_tiptip);
+					$(window).on('resize.tipTip', position_tiptip);
+					if (opts.container !== 'body') {
+						data['container'] = obj.parents(opts.container);
+						data['container'].on('scroll.tipTip', position_tiptip);
+					} else {
+						$(window).on('scroll.tipTip', position_tiptip);
+					};
 				};
 
 				// получаем текст и добавляем в `data.content`
@@ -235,6 +251,7 @@
 				// добавляем класс
 				opts.cssClass += ' TipTip TipTip--theme-'+ opts.theme;
 				data.holder.addClass(opts.cssClass);
+				data.holder.addClass('TipTip--is-active');
 
 				// определяем положение Типа
 				position_tiptip();
@@ -250,6 +267,7 @@
 				};
 
 				timeout = setTimeout(function () {
+					data.holder.data().tipTip.isActive = true;
 					data.holder.stop(true, true).fadeIn(opts.fadeIn);
 				}, opts.delay);
 
@@ -309,7 +327,9 @@
 
 				if (data.holder) {
 					data.holder.fadeOut(opts.fadeOut, function(){
-				});
+						data.holder.data().tipTip.isActive = false;
+						data.holder.removeClass('TipTip--is-active');
+					});
 				};
 			};
 
@@ -323,7 +343,8 @@
 
 				// в этой ситуации Тип уничтожен
 				// проверка нужна, потому что для уничтоженного также будет производиться пересчёт положения при изменении размеров области просмотра
-				if (!data) { return false; };
+				// и позиционировать нужно только те, которые активны
+				if (!data || !data.holder || !data.holder.hasClass('TipTip--is-active')) { return false; };
 
 				var obj_offset = obj.offset();
 				var obj_top = obj_offset.top;
@@ -352,11 +373,20 @@
 				var arrow_width = 12;
 				var arrow_height = 12;
 
-				var win = $(window);
-				var win_top = win.scrollTop();
-				var win_left = win.scrollLeft();
-				var win_width = win.width();
-				var win_height = win.height();
+				var wrap = $(window);
+
+				if (opts.container !== 'body') {
+					var container_offset = data.container.offset();
+					var obj_top = obj_offset.top - container_offset.top;
+					var obj_left = obj_offset.left - container_offset.left;
+
+					wrap = $(opts.container);
+				};
+
+				var win_top = wrap.scrollTop();
+				var win_left = wrap.scrollLeft();
+				var win_width = wrap.width();
+				var win_height = wrap.height();
 
 				var is_rtl = opts.detectTextDir && isRtlText(data.content.text());
 
