@@ -4,7 +4,7 @@
  *
  * Modified by: Sergei Vasilev (https://github.com/Ser-Gen/TipTip)
  *
- * Version 1.5.0
+ * Version 1.5.1
  *
  * This TipTip jQuery plug-in is dual licensed under the MIT and GPL licenses:
  *   http://www.opensource.org/licenses/mit-license.php
@@ -58,6 +58,8 @@
 				options, // переданные при инициализации
 				obj.data('tipTip') || {} // из атрибута, самый большой приоритет
 			);
+			var timeout = false;
+			var timeoutHover = false;
 			var timeoutHide = false;
 
 			if (!!data) {
@@ -95,8 +97,6 @@
 			} else if (options === 'position') {
 				position_tiptip();
 			} else {
-				var timeout = false;
-				var timeoutHover = false;
 
 				$.data(obj[0], 'tipTip', { options: opts });
 
@@ -107,8 +107,13 @@
 						} else {
 							active_tiptip();
 						};
+						if (timeoutHide) {
+							clearTimeout(timeoutHide);
+						};
 					}).on('mouseleave.tipTip', function () {
-						if (timeoutHover){
+						var data = $.data(this, 'tipTip');
+
+						if (timeoutHover) {
 							clearTimeout(timeoutHover);
 						};
 						
@@ -300,9 +305,11 @@
 				} else {
 					
 					// не скрываем Тип, если на него навели
-					data.holder.one('mouseenter.tipTip', function() {
+					// или вернулись на родителя
+					data.holder.off('.tipTip-deactive');
+					data.holder.on('mouseenter.tipTip-deactive', function() {
 						clearTimeout(timeoutHide);
-						data.holder.on('mouseleave.tipTip', function() {
+						data.holder.on('mouseleave.tipTip-deactive', function() {
 							deactive_tiptip();
 						});
 					});
@@ -312,14 +319,6 @@
 					}, delay);
 
 				};
-
-				setTimeout(function() {
-					
-					// это должно происходить и когда Тип визуально скрыт или перемещён с помощью `active_tiptip()`
-					obj.removeClass(opts.objActiveClass);
-					opts.afterExit.call(obj, data);
-				}, delay);
-
 			};
 
 			function hide_tiptip() {
@@ -329,6 +328,10 @@
 					data.holder.fadeOut(opts.fadeOut, function(){
 						data.holder.data().tipTip.isActive = false;
 						data.holder.removeClass('TipTip--is-active');
+					
+						// это должно происходить и когда Тип визуально скрыт или перемещён с помощью `active_tiptip()`
+						obj.removeClass(opts.objActiveClass);
+						opts.afterExit.call(obj, data);
 					});
 				};
 			};

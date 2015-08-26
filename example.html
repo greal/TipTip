@@ -69,6 +69,7 @@ body {
 	</div>
 </span>
 <span class="test--extended" data-tip-tip='{"defaultPosition":"bottom","theme":"black", "content": "Можно придумывать свои способы поведения при взаимодействии"}'>По нажатию дополнительно</span>
+<span class="test--hover" title="С задержанным скрытием. Тип останется активным в том числе при наведении на него и при возвращении к родителю">По наведению</span>
 
 
 <style>
@@ -104,6 +105,10 @@ var tipTip = {
 	theme: 'white',
 	hideOthers: false
 };
+
+$('.test--hover').tipTip({
+	delayHide: 100
+})
 
 // добавляем Тип всем элементам с классом `test--usual`
 $('.test--usual').each(function () {
