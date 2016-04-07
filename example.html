@@ -14,7 +14,7 @@ body {
 
 body {
 	background-color: #f5f5f5;
-	font-size: 2em;
+	font-size: 1.5em;
 	text-align: center;
 	
 	  -webkit-box-align: center;
@@ -34,6 +34,8 @@ body {
 	        flex-wrap: wrap;
 	-webkit-align-content: center;
 	        align-content: center;
+	
+	width: 200%;
 }
 
 [class^="test"] {
@@ -50,7 +52,6 @@ body {
 <body>
 
 <span class="test--simple js-TipTip" title="По классу <code>js-TipTip</code>">Стандартный</span>
-<span class="test--manual">Программно отображающийся</span>
 <span class="test--usual" title="Можно добавлять функциональность типа любому элементу" data-tip-tip='{"defaultPosition":"right"}'>С классом</span>
 <div class="test--usual" data-tip-tip='{"defaultPosition":"left"}'>
 	Содержимое из блока
@@ -59,17 +60,19 @@ body {
 		<span>Может быть полезным в случае сложной разметки содержимого типа. Элемент-донор скрывается стилями.</span>
 	</div>
 </div>
+<span class="test--manual">Программно отображающийся</span>
 <span class="test--usual" title="Способов активации несколько" data-tip-tip='{"defaultPosition":"left","theme":"black","activation":"click","keepAlive":true,"hideOnClick":true,"delay":"100","fadeIn":"100"}'>По нажатию</span>
 <span class="test--usual" title="Этот текст выведется стандартно" data-tip-tip='{"activation":"click","keepAlive":true,"hideOnClick":true,"delay":"100","fadeIn":"100"}'>
 	По нажатию с закрытием
-	<div class="TipTip__donor">
+	<span class="TipTip__donor">
 		<a href="#" class="TipTip__close">Закрыть</a>
-		<div><strong>Содержимое подгружается из элемента внутри родителя с функциональностью Типа</strong></div>
+		<strong style="display: block;">Содержимое подгружается из элемента внутри родителя с функциональностью Типа</strong>
 		<span>Может быть полезным в случае сложной разметки содержимого типа. Элемент-донор скрывается стилями.</span>
-	</div>
+	</span>
 </span>
 <span class="test--extended" data-tip-tip='{"defaultPosition":"bottom","theme":"black", "content": "Можно придумывать свои способы поведения при взаимодействии"}'>По нажатию дополнительно</span>
 <span class="test--hover" title="С задержанным скрытием. Тип останется активным в том числе при наведении на него и при возвращении к родителю">По наведению</span>
+<span class="test--conditional" title="Закроется по нажатию где угодно">Скрытие по нажатию</span>
 
 
 <style>
@@ -95,7 +98,7 @@ body {
 </div>
 
 
-<script src="http://yandex.st/jquery/1.11.0/jquery.min.js"></script>
+<script src="http://yandex.st/jquery/1.12.0/jquery.min.js"></script>
 <script src="jquery.tipTip.js"></script>
 
 <script>
@@ -119,7 +122,7 @@ $('.test--usual').each(function () {
 $('.test--manual').tipTip({
 	content: 'Добавлять Тип и управлять его поведением можно из скрипта',
 	activation: 'manual',
-	defaultPosition: 'bottom'
+	defaultPosition: 'left'
 });
 $('.test--manual').tipTip('show'); // это программно отобразит применённый Тип без взаимодействия с ним
 
@@ -152,6 +155,17 @@ $('.test--extended').click(function() {
 		obj.data().tipTip.holder.data().tipTip.obj.html('Тип был активирован');
 	};
 });
+
+
+// показан по-умолчанию
+// скрывается по нажатию
+$('.test--conditional').tipTip({
+	activation: "click",
+	keepAlive: true,
+	hideOnClick: true,
+	delay: 100,
+	fadeIn: 100
+}).tipTip('show');
 
 </script>
 
