@@ -72,7 +72,7 @@ body {
 </span>
 <span class="test--extended" data-tip-tip='{"defaultPosition":"bottom","theme":"black", "content": "Можно придумывать свои способы поведения при взаимодействии"}'>По нажатию дополнительно</span>
 <span class="test--hover" title="С задержанным скрытием. Тип останется активным в том числе при наведении на него и при возвращении к родителю">По наведению</span>
-<span class="test--conditional" title="Закроется по нажатию где угодно">Скрытие по нажатию</span>
+<span class="test--conditional">Скрытие по нажатию</span>
 
 
 <style>
@@ -155,17 +155,6 @@ $('.test--extended').click(function() {
 		obj.data().tipTip.holder.data().tipTip.obj.html('Тип был активирован');
 	};
 });
-
-
-// показан по-умолчанию
-// скрывается по нажатию
-$('.test--conditional').tipTip({
-	activation: "click",
-	keepAlive: true,
-	hideOnClick: true,
-	delay: 100,
-	fadeIn: 100
-}).tipTip('show');
 
 </script>
 

@@ -4,7 +4,7 @@
  *
  * Modified by: Sergei Vasilev (https://github.com/Ser-Gen/TipTip)
  *
- * Version 1.6.0
+ * Version 1.7.0
  *
  * This TipTip jQuery plug-in is dual licensed under the MIT and GPL licenses:
  *   http://www.opensource.org/licenses/mit-license.php
@@ -36,7 +36,7 @@
 			exit: function () { }, // функция перед скрытием
 			afterExit: function () { }, // функция после скрытия
 
-			theme: 'black', // устанавливается тема, выбор из `black`, `alt` и `white`
+			theme: 'black', // устанавливается тема, выбор из `black`, `alt`, `white` и `error`
 			cssClass: '', // класс будет добавлен типу перед его отображением
 
 			objActiveClass: 'TipTip__active', // класс-маркер, чтобы облегчить определение родителя активного типа; будет удалён при помощи `deactive_tiptip()`
@@ -70,6 +70,11 @@
 				data = { 'options': opts };
 			};
 			$.data(obj[0], 'tipTip', data);
+
+			// если нет указанного контейнера
+			if (!$(opts.container).length) {
+				opts.container = 'body';
+			};
 
 			// если нет содержимого, установленного напрямую, и функции, возвращаемой содержимое
 			if (!opts.content && !$.isFunction(opts.content)) {
@@ -155,7 +160,10 @@
 
 					// скрывать Тип, когда пользователь нажимает куда угодно кроме самого Типа
 					$('html').on('tipTip-check', obj, function(e, target) {
-						if (obj.hasClass(opts.objActiveClass) && $.data(obj[0], 'tipTip').holder) {
+						if (!$.data(obj[0], 'tipTip')) {
+							deactive_tiptip();
+						}
+						else if (obj.hasClass(opts.objActiveClass) && $.data(obj[0], 'tipTip').holder) {
 							if ($(target).parents('.TipTip').get(0) != $.data(obj[0], 'tipTip').holder.get(0)) {
 								deactive_tiptip();
 							};
@@ -226,22 +234,23 @@
 					} else {
 						$(window).on('scroll.tipTip', position_tiptip);
 					};
+
+					// получаем текст и добавляем в `data.content`
+					var org_title;
+
+					// даже если напрямую содержимое не устанавливается, уже использовался атрибут
+					if (opts.content) {
+						org_title = $.isFunction(opts.content) ? opts.content.call(obj, data) : opts.content;
+					};
+
+					// не отображать Тип, если нет содержимого
+					if (!org_title) {
+						return;
+					};
+
+					data.content.html(org_title);
 				};
-
-				// получаем текст и добавляем в `data.content`
-				var org_title;
-
-				// даже если напрямую содержимое не устанавливается, уже использовался атрибут
-				if (opts.content) {
-					org_title = $.isFunction(opts.content) ? opts.content.call(obj, data) : opts.content;
-				};
-
-				// не отображать Тип, если нет содержимого
-				if (!org_title) {
-					return;
-				};
-
-				data.content.html(org_title);
+				
 				data.holder.hide().removeAttr('class').css({
 					'max-width': opts.maxWidth,
 					'width': opts.width
