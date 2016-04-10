@@ -4,7 +4,7 @@
  *
  * Modified by: Sergei Vasilev (https://github.com/Ser-Gen/TipTip)
  *
- * Version 1.7.0
+ * Version 1.6.1
  *
  * This TipTip jQuery plug-in is dual licensed under the MIT and GPL licenses:
  *   http://www.opensource.org/licenses/mit-license.php
@@ -250,7 +250,7 @@
 
 					data.content.html(org_title);
 				};
-				
+
 				data.holder.hide().removeAttr('class').css({
 					'max-width': opts.maxWidth,
 					'width': opts.width
