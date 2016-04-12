@@ -4,7 +4,7 @@
  *
  * Modified by: Sergei Vasilev (https://github.com/Ser-Gen/TipTip)
  *
- * Version 1.6.1
+ * Version 1.6.2
  *
  * This TipTip jQuery plug-in is dual licensed under the MIT and GPL licenses:
  *   http://www.opensource.org/licenses/mit-license.php
@@ -496,6 +496,12 @@
 					.removeClass(tip_classes.left)
 					.removeClass(tip_classes.right)
 					.addClass(tip_class);
+
+				if (opts.container !== 'body') {
+					if (+wrap.css('z-index') > +data.holder.css('z-index')) {
+						data.holder.css('z-index', +wrap.css('z-index') + 1);
+					};
+				};
 
 				// позиционируем стрелку
 				if (tip_class == tip_classes.top) {

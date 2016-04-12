@@ -4,7 +4,7 @@
  *
  * Modified by: Sergei Vasilev (https://github.com/Ser-Gen/TipTip)
  *
- * Version 1.6.1
+ * Version 1.6.2
  *
  * This TipTip jQuery plug-in is dual licensed under the MIT and GPL licenses:
  *   http://www.opensource.org/licenses/mit-license.php
@@ -42,6 +42,7 @@
 	font-size: 12px;
 	line-height: 1.4;
 	padding: 4px 8px;
+	word-wrap: break-word;
 }
 
 .TipTip__arrow,
@@ -49,6 +50,7 @@
 	height: 0;
 	position: absolute;
 	width: 0;
+	pointer-events: none;
 }
 
 .TipTip__donor {
@@ -76,6 +78,10 @@
 	border: 1px solid rgba(255,255,255,.25);
 	color: #fff;
 	text-shadow: 0 0 2px #000;
+}
+
+.TipTip--theme-black .TipTip__content a {
+	color: #95bff0;
 }
 
 .TipTip.TipTip--theme-black .TipTip__arrow,
@@ -114,7 +120,7 @@
 	border-right-color: rgb(25,25,25);
 	border-right-color: rgba(25,25,25,.92);
 	margin-top: -6px;
-	margin-left: -5px;
+	margin-left: 0;
 }
 .TipTip--left.TipTip--theme-black .TipTip__pointer {
 	border-left-color: rgb(25,25,25);
