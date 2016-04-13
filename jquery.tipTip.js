@@ -4,7 +4,7 @@
  *
  * Modified by: Sergei Vasilev (https://github.com/Ser-Gen/TipTip)
  *
- * Version 1.6.2
+ * Version 1.7.0
  *
  * This TipTip jQuery plug-in is dual licensed under the MIT and GPL licenses:
  *   http://www.opensource.org/licenses/mit-license.php
@@ -44,6 +44,9 @@
 			container: 'body', // элемент, потенциально прокручиваемый, внутрь которого будет добавляться разметка Типа
 
 			shiftByViewport: true, // автоматическое подстраивание под область видимости
+			preserveDirection: false, // будет ли сохраняться направление, указанное в `defaultPosition` при автоматическом подстраивании
+			preservePosition: false, // будет ли сохраняться положение выпадения или Тип будет вдвигаться в область видимости
+			
 			detectTextDir: false // автоматическое определение правостороннего текста, немного замедляет работу
 		};
 
@@ -453,36 +456,47 @@
 				// если включен сдвиг под область видимости
 				if (opts.shiftByViewport) {
 
-					// выдвигаем Тип, если он выходит за пределы экрана (слева <-> справа и сверху <-> снизу)
-					if (tip_class == tip_classes.left && !is_rtl && tip_left < win_left) {
-						moveRight();
-					} else if (tip_class == tip_classes.left && is_rtl && tip_left - tip_width < win_left) {
-						moveRight();
-					} else if (tip_class == tip_classes.right && !is_rtl && tip_left > win_left + win_width) {
-						moveLeft();
-					} else if (tip_class == tip_classes.right && is_rtl && tip_left + tip_width > win_left + win_width) {
-						moveLeft();
-					} else if (tip_class == tip_classes.top && tip_top < win_top) {
-						moveBottom();
-					} else if (tip_class == tip_classes.bottom && tip_top + tip_height > win_top + win_height) {
-						moveTop();
-					};
+					// если разрешена смена направления,
+					// чтобы изменять направление выпадения
+					if (!opts.preserveDirection) {
 
-					// исправляем вертикальное положение, если Тип выпал сверху или снизу за область просмотра
-					if (tip_class == tip_classes.left || tip_class == tip_classes.right) { // если позиционируется слева или справа, проверяем не выходит ли за верхний или нижний край области просмотра
-						if (tip_top + tip_height > win_height + win_top) { // если нижняя сторона Типа выходит за нижнюю сторону области просмотра
-							tip_top = obj_top + obj_height > win_height + win_top ? obj_top + obj_height - tip_height : win_height + win_top - tip_height - 4; // выравниваем их
-						} else if (tip_top < win_top) { // если верхняя сторона Типа выходит за верхнюю сторону области просмотра
-							tip_top = obj_top < win_top ? obj_top : win_top + 4; // выравниваем их
+						// выдвигаем Тип, если он выходит за пределы экрана (слева <-> справа и сверху <-> снизу)
+						if (tip_class == tip_classes.left && !is_rtl && tip_left < win_left) {
+							moveRight();
+						} else if (tip_class == tip_classes.left && is_rtl && tip_left - tip_width < win_left) {
+							moveRight();
+						} else if (tip_class == tip_classes.right && !is_rtl && tip_left > win_left + win_width) {
+							moveLeft();
+						} else if (tip_class == tip_classes.right && is_rtl && tip_left + tip_width > win_left + win_width) {
+							moveLeft();
+						} else if (tip_class == tip_classes.top && tip_top < win_top) {
+							moveBottom();
+						} else if (tip_class == tip_classes.bottom && tip_top + tip_height > win_top + win_height) {
+							moveTop();
 						};
 					};
 
-					// исправляем вертикальное положение, если Тип выпал слева или справа за область просмотра
-					if (tip_class == tip_classes.top || tip_class == tip_classes.bottom) {
-						if (tip_left + tip_width > win_width + win_left) { // если правая сторона Типа выходит за правую сторону области просмотра
-							tip_left = obj_left + obj_width > win_width + win_left ? obj_left + obj_width - tip_width : win_width + win_left - tip_width - 4; // выравниваем правую сторону Типа с правой стороной области просмотра
-						} else if (tip_left < win_left) { // если левая сторона Типа выходит за левую сторону области просмотра
-							tip_left = obj_left < win_left ? obj_left : win_left + 4; // выравниваем их
+
+					// если разрешена смена направления,
+					// чтобы перемещать в область видимости
+					if (!opts.preservePosition) {
+
+						// исправляем вертикальное положение, если Тип выпал сверху или снизу за область просмотра
+						if (tip_class == tip_classes.left || tip_class == tip_classes.right) { // если позиционируется слева или справа, проверяем не выходит ли за верхний или нижний край области просмотра
+							if (tip_top + tip_height > win_height + win_top) { // если нижняя сторона Типа выходит за нижнюю сторону области просмотра
+								tip_top = obj_top + obj_height > win_height + win_top ? obj_top + obj_height - tip_height : win_height + win_top - tip_height - 4; // выравниваем их
+							} else if (tip_top < win_top) { // если верхняя сторона Типа выходит за верхнюю сторону области просмотра
+								tip_top = obj_top < win_top ? obj_top : win_top + 4; // выравниваем их
+							};
+						};
+
+						// исправляем вертикальное положение, если Тип выпал слева или справа за область просмотра
+						if (tip_class == tip_classes.top || tip_class == tip_classes.bottom) {
+							if (tip_left + tip_width > win_width + win_left) { // если правая сторона Типа выходит за правую сторону области просмотра
+								tip_left = obj_left + obj_width > win_width + win_left ? obj_left + obj_width - tip_width : win_width + win_left - tip_width - 4; // выравниваем правую сторону Типа с правой стороной области просмотра
+							} else if (tip_left < win_left) { // если левая сторона Типа выходит за левую сторону области просмотра
+								tip_left = obj_left < win_left ? obj_left : win_left + 4; // выравниваем их
+							};
 						};
 					};
 
