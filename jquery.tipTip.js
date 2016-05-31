@@ -4,7 +4,7 @@
  *
  * Modified by: Sergei Vasilev (https://github.com/Ser-Gen/TipTip)
  *
- * Version 1.7.0
+ * Version 1.7.1
  *
  * This TipTip jQuery plug-in is dual licensed under the MIT and GPL licenses:
  *   http://www.opensource.org/licenses/mit-license.php
@@ -69,7 +69,8 @@
 
 			if (!!data) {
 				data['options'] = opts;
-			} else {
+			}
+			else {
 				data = { 'options': opts };
 			};
 			$.data(obj[0], 'tipTip', data);
@@ -87,7 +88,8 @@
 
 				if (tiptip_donor.length) {
 					opts.content = tiptip_donor.html();
-				} else {
+				}
+				else {
 
 					// иначе используем стандартный атрибут
 					// запоминаем и удаляем `opts.attribute`, чтобы браузер не отображал стандартную подсказку
@@ -98,25 +100,40 @@
 				};
 			};
 
+			// принудительное отображение Типа
 			if (options === 'show') {
 				active_tiptip();
-			} else if (options === 'hide') {
+			}
+
+			// принудительное скрытие Типа
+			else if (options === 'hide') {
 				deactive_tiptip();
-			} else if (options === 'destroy') {
+			}
+
+			// уничтожение Типа
+			else if (options === 'destroy') {
 				destroy_tiptip();
-			} else if (options === 'position') {
+			}
+
+			// позиционирование Типа
+			else if (options === 'position') {
 				position_tiptip();
-			} else {
+			}
+			else {
 
 				$.data(obj[0], 'tipTip', { options: opts });
 
 				if (opts.activation == 'hover') {
 					obj.on('mouseenter.tipTip', function () {
-						if (opts.delayHover){
-							timeoutHover = setTimeout( function(){ active_tiptip() }, opts.delayHover);
-						} else {
+						if (opts.delayHover) {
+							timeoutHover = setTimeout( function () {
+									active_tiptip();
+								}, opts.delayHover);
+						}
+						else {
 							active_tiptip();
 						};
+
 						if (timeoutHide) {
 							clearTimeout(timeoutHide);
 						};
@@ -129,29 +146,34 @@
 						
 						if (!opts.keepAlive) {
 							deactive_tiptip();
-						} else {
+						}
+						else {
 							data.holder.one('mouseleave.tipTip', function () {
 								deactive_tiptip();
 							});
 						};
+
 						if (opts.hideOnClick) {
 							deactive_on_click();
 						};
 					});
-				} else if (opts.activation == 'focus') {
+				}
+				else if (opts.activation == 'focus') {
 					obj.on('focus.tipTip', function () {
 						active_tiptip();
 					}).on('blur.tipTip', function () {
 						deactive_tiptip();
 					});
-				} else if (opts.activation == 'click') {
+				}
+				else if (opts.activation == 'click') {
 					obj.on('click.tipTip', function (e) {
 						e.preventDefault();
 
 						if (!$(this).hasClass(opts.objActiveClass)) {
-							$('html').trigger('tipTip-check', [$(e.target)]);
+							$('html').trigger('check.tipTip', [$(e.target)]);
 							setImmediate(active_tiptip);
-						} else {
+						}
+						else {
 							deactive_tiptip();
 						};
 					});
@@ -162,7 +184,7 @@
 					};
 
 					// скрывать Тип, когда пользователь нажимает куда угодно кроме самого Типа
-					$('html').on('tipTip-check', obj, function(e, target) {
+					$('html').on('check.tipTip', obj, function(e, target) {
 						if (!$.data(obj[0], 'tipTip')) {
 							deactive_tiptip();
 						}
@@ -178,7 +200,8 @@
 						obj.on('mouseleave.tipTip', function () {
 							if (!opts.keepAlive) {
 								deactive_tiptip();
-							} else if (!opts.hideOnClick) {
+							}
+							else if (!opts.hideOnClick) {
 
 								// сейчас данные уже обновились
 								$.data(obj[0], 'tipTip').holder.one('mouseleave.tipTip', function () {
@@ -187,18 +210,21 @@
 							};
 						});
 					};
-				} else if (opts.activation == 'manual') {
+				}
+				else if (opts.activation == 'manual') {
 					// нечего регистрировать, разработчик сам поймёт что, где, когда показывать
 				};
 			};
-				
-			function deactive_on_click() {
+			
+			// отключение по нажатию вне Типа
+			function deactive_on_click () {
 				$('html').off('click.tipTip').on('click.tipTip', function(e) {
-					$('html').trigger('tipTip-check', [$(e.target)]); 
+					$('html').trigger('check.tipTip', [$(e.target)]); 
 				});
 			};
 
-			function active_tiptip() {
+			// активация Типа
+			function active_tiptip () {
 				var data = $.data(obj[0], 'tipTip');
 
 				if (opts.enter.call(obj, data) === false || obj.hasClass(opts.objActiveClass)) {
@@ -234,7 +260,8 @@
 					if (opts.container !== 'body') {
 						data['container'] = obj.parents(opts.container);
 						data['container'].on('scroll.tipTip', position_tiptip);
-					} else {
+					}
+					else {
 						$(window).on('scroll.tipTip', position_tiptip);
 					};
 
@@ -298,7 +325,8 @@
 				opts.afterEnter.call(obj, data);
 			};
 
-			function deactive_tiptip(delay) {
+			// отключение Типа
+			function deactive_tiptip (delay) {
 				var data = $.data(obj[0], 'tipTip');
 
 				if (opts.exit.call(obj, data) === false) {
@@ -313,13 +341,14 @@
 				var delay = (delay !== undefined) ? delay : opts.delayHide;
 
 				if (delay == 0) {
-					hide_tiptip(data);
+					hide_tiptip();
 
 					// если пользователь нажал, убираем отложенное скрытие
 					if (opts.delayHide > 0) {
 						clearTimeout(timeoutHide);
 					};
-				} else {
+				}
+				else {
 					
 					// не скрываем Тип, если на него навели
 					// или вернулись на родителя
@@ -340,7 +369,8 @@
 				};
 			};
 
-			function hide_tiptip() {
+			// скрытие Типа
+			function hide_tiptip (cb) {
 				var data = $.data(obj[0], 'tipTip');
 
 				if (data.holder) {
@@ -351,15 +381,29 @@
 						// это должно происходить и когда Тип визуально скрыт или перемещён с помощью `active_tiptip()`
 						obj.removeClass(opts.objActiveClass);
 						opts.afterExit.call(obj, data);
+
+						if (cb) {
+							cb();
+						};
 					});
 				};
 			};
 
+			// уничтожение Типа
 			function destroy_tiptip() {
-				obj.off('.tipTip').removeData('tipTip');
+				hide_tiptip(function () {
+					var data = $.data(obj[0], 'tipTip');
+
+					if (data.holder) {
+						data.holder.remove();
+					};
+
+					obj.off('.tipTip').removeData('tipTip');
+				});
 			};
 
-			function position_tiptip() {
+			// позиционирование Типа
+			function position_tiptip () {
 
 				var data = $.data(obj[0], 'tipTip');
 
@@ -439,17 +483,23 @@
 				// вычисляем положение Типа
 				if (opts.defaultPosition == 'bottom') {
 					moveBottom();
-				} else if (opts.defaultPosition == 'top') {
+				}
+				else if (opts.defaultPosition == 'top') {
 					moveTop();
-				} else if (opts.defaultPosition == 'left' && !is_rtl) {
+				}
+				else if (opts.defaultPosition == 'left' && !is_rtl) {
 					moveLeft();
-				} else if (opts.defaultPosition == 'left' && is_rtl) {
+				}
+				else if (opts.defaultPosition == 'left' && is_rtl) {
 					moveRight();
-				} else if (opts.defaultPosition == 'right' && !is_rtl) {
+				}
+				else if (opts.defaultPosition == 'right' && !is_rtl) {
 					moveRight();
-				} else if (opts.defaultPosition == 'right' && is_rtl) {
+				}
+				else if (opts.defaultPosition == 'right' && is_rtl) {
 					moveLeft();
-				} else {
+				}
+				else {
 					moveBottom();
 				};
 
@@ -463,15 +513,20 @@
 						// выдвигаем Тип, если он выходит за пределы экрана (слева <-> справа и сверху <-> снизу)
 						if (tip_class == tip_classes.left && !is_rtl && tip_left < win_left) {
 							moveRight();
-						} else if (tip_class == tip_classes.left && is_rtl && tip_left - tip_width < win_left) {
+						}
+						else if (tip_class == tip_classes.left && is_rtl && tip_left - tip_width < win_left) {
 							moveRight();
-						} else if (tip_class == tip_classes.right && !is_rtl && tip_left > win_left + win_width) {
+						}
+						else if (tip_class == tip_classes.right && !is_rtl && tip_left > win_left + win_width) {
 							moveLeft();
-						} else if (tip_class == tip_classes.right && is_rtl && tip_left + tip_width > win_left + win_width) {
+						}
+						else if (tip_class == tip_classes.right && is_rtl && tip_left + tip_width > win_left + win_width) {
 							moveLeft();
-						} else if (tip_class == tip_classes.top && tip_top < win_top) {
+						}
+						else if (tip_class == tip_classes.top && tip_top < win_top) {
 							moveBottom();
-						} else if (tip_class == tip_classes.bottom && tip_top + tip_height > win_top + win_height) {
+						}
+						else if (tip_class == tip_classes.bottom && tip_top + tip_height > win_top + win_height) {
 							moveTop();
 						};
 					};
@@ -482,20 +537,39 @@
 					if (!opts.preservePosition) {
 
 						// исправляем вертикальное положение, если Тип выпал сверху или снизу за область просмотра
-						if (tip_class == tip_classes.left || tip_class == tip_classes.right) { // если позиционируется слева или справа, проверяем не выходит ли за верхний или нижний край области просмотра
-							if (tip_top + tip_height > win_height + win_top) { // если нижняя сторона Типа выходит за нижнюю сторону области просмотра
-								tip_top = obj_top + obj_height > win_height + win_top ? obj_top + obj_height - tip_height : win_height + win_top - tip_height - 4; // выравниваем их
-							} else if (tip_top < win_top) { // если верхняя сторона Типа выходит за верхнюю сторону области просмотра
-								tip_top = obj_top < win_top ? obj_top : win_top + 4; // выравниваем их
+						
+						// если позиционируется слева или справа, проверяем не выходит ли за верхний или нижний край области просмотра
+						if (tip_class == tip_classes.left || tip_class == tip_classes.right) {
+
+							// если нижняя сторона Типа выходит за нижнюю сторону области просмотра
+							if (tip_top + tip_height > win_height + win_top) {
+								// выравниваем их
+								tip_top = obj_top + obj_height > win_height + win_top ? obj_top + obj_height - tip_height : win_height + win_top - tip_height - 4;
+							}
+
+							// если верхняя сторона Типа выходит за верхнюю сторону области просмотра
+							else if (tip_top < win_top) {
+
+								// выравниваем их
+								tip_top = obj_top < win_top ? obj_top : win_top + 4;
 							};
 						};
 
 						// исправляем вертикальное положение, если Тип выпал слева или справа за область просмотра
 						if (tip_class == tip_classes.top || tip_class == tip_classes.bottom) {
-							if (tip_left + tip_width > win_width + win_left) { // если правая сторона Типа выходит за правую сторону области просмотра
-								tip_left = obj_left + obj_width > win_width + win_left ? obj_left + obj_width - tip_width : win_width + win_left - tip_width - 4; // выравниваем правую сторону Типа с правой стороной области просмотра
-							} else if (tip_left < win_left) { // если левая сторона Типа выходит за левую сторону области просмотра
-								tip_left = obj_left < win_left ? obj_left : win_left + 4; // выравниваем их
+
+							// если правая сторона Типа выходит за правую сторону области просмотра
+							if (tip_left + tip_width > win_width + win_left) {
+
+								// выравниваем правую сторону Типа с правой стороной области просмотра
+								tip_left = obj_left + obj_width > win_width + win_left ? obj_left + obj_width - tip_width : win_width + win_left - tip_width - 4;
+
+							// если левая сторона Типа выходит за левую сторону области просмотра
+							}
+							else if (tip_left < win_left) {
+
+								// выравниваем их
+								tip_left = obj_left < win_left ? obj_left : win_left + 4;
 							};
 						};
 					};
@@ -518,18 +592,35 @@
 				};
 
 				// позиционируем стрелку
+				// стрелка снизу
 				if (tip_class == tip_classes.top) {
-					arrow_top = tip_height; // стрелка снизу
-					arrow_left = obj_left - tip_left + ((obj_width - arrow_width) / 2); // центрируется по горизонтали посередине родителя
-				} else if (tip_class == tip_classes.bottom) {
-					arrow_top = -arrow_height; // стрелка сверху
-					arrow_left = obj_left - tip_left + ((obj_width - arrow_width) / 2); // центрируется по горизонтали посередине родителя
-				} else if (tip_class == tip_classes.left) {
-					arrow_top = obj_top - tip_top + ((obj_height - arrow_height) / 2); // центрируется по вертикали посередине родителя
-					arrow_left = tip_width; // стрелка справа
-				} else if (tip_class == tip_classes.right) {
-					arrow_top = obj_top - tip_top + ((obj_height - arrow_height) / 2); // центрируется по горизонтали посередине родителя
-					arrow_left = -arrow_width; // стрелка слева
+
+					// центрируется по горизонтали посередине родителя
+					arrow_top = tip_height;
+					arrow_left = obj_left - tip_left + ((obj_width - arrow_width) / 2);
+				}
+				// стрелка сверху
+				else if (tip_class == tip_classes.bottom) {
+
+					// центрируется по горизонтали посередине родителя
+					arrow_top = -arrow_height;
+					arrow_left = obj_left - tip_left + ((obj_width - arrow_width) / 2);
+				}
+
+				// стрелка справа
+				else if (tip_class == tip_classes.left) {
+
+					// центрируется по вертикали посередине родителя
+					arrow_top = obj_top - tip_top + ((obj_height - arrow_height) / 2);
+					arrow_left = tip_width;
+				}
+
+				// стрелка слева
+				else if (tip_class == tip_classes.right) {
+
+					// центрируется по горизонтали посередине родителя
+					arrow_top = obj_top - tip_top + ((obj_height - arrow_height) / 2);
+					arrow_left = -arrow_width;
 				};
 
 				data.arrow.css({
@@ -553,18 +644,23 @@
 
 	// http://learn.javascript.ru/setimmediate
 	if (!window.setImmediate) window.setImmediate = (function() {
-		var head = { }, tail = head; // очередь вызовов, 1-связный список
-		var ID = Math.random(); // уникальный идентификатор
+
+		// очередь вызовов, 1-связный список
+		var head = { }, tail = head;
+
+		// уникальный идентификатор
+		var ID = Math.random();
 
 		function onmessage(e) {
-			if(e.data != ID) return; // не наше сообщение
+			if (e.data != ID) return; // не наше сообщение
 			head = head.next;
 			var func = head.func;
 			delete head.func;
 			func();
 		};
 
-		if(window.addEventListener) { // IE9+, другие браузеры
+		// IE9+, другие браузеры
+		if (window.addEventListener) {
 			window.addEventListener('message', onmessage, false);
 		};
 
