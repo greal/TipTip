@@ -124,8 +124,11 @@ $('.test--manual').tipTip({
 	content: 'Добавлять Тип и управлять его поведением можно из скрипта',
 	activation: 'manual',
 	defaultPosition: 'left'
-});
-$('.test--manual').tipTip('show'); // это программно отобразит применённый Тип без взаимодействия с ним
+}).tipTip('show'); // это программно отобразит применённый Тип без взаимодействия с ним
+
+setTimeout(function () {
+	$('.test--manual').tipTip('destroy');
+}, 2000)
 
 
 // полностью программно создаваемый тип
