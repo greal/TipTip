@@ -4,7 +4,7 @@
  *
  * Modified by: Sergei Vasilev (https://github.com/Ser-Gen/TipTip)
  *
- * Version 1.7.1
+ * Version 1.7.2
  *
  * This TipTip jQuery plug-in is dual licensed under the MIT and GPL licenses:
  *   http://www.opensource.org/licenses/mit-license.php
@@ -148,9 +148,11 @@
 							deactive_tiptip();
 						}
 						else {
-							data.holder.one('mouseleave.tipTip', function () {
-								deactive_tiptip();
-							});
+							if (data && data.holder) {
+								data.holder.one('mouseleave.tipTip', function () {
+									deactive_tiptip();
+								});
+							};
 						};
 
 						if (opts.hideOnClick) {
@@ -185,11 +187,13 @@
 
 					// скрывать Тип, когда пользователь нажимает куда угодно кроме самого Типа
 					$('html').on('check.tipTip', obj, function(e, target) {
-						if (!$.data(obj[0], 'tipTip')) {
+						var data = $.data(obj[0], 'tipTip');
+
+						if (!data) {
 							deactive_tiptip();
 						}
-						else if (obj.hasClass(opts.objActiveClass) && $.data(obj[0], 'tipTip').holder) {
-							if ($(target).parents('.TipTip').get(0) != $.data(obj[0], 'tipTip').holder.get(0)) {
+						else if (obj.hasClass(opts.objActiveClass) && data.holder) {
+							if ($(target).parents('.TipTip').get(0) != data.holder.get(0)) {
 								deactive_tiptip();
 							};
 						};
@@ -198,15 +202,19 @@
 					// если работа не полностью на нажатиях
 					if (!opts.keepAlive || !opts.hideOnClick) {
 						obj.on('mouseleave.tipTip', function () {
+							var data = $.data(obj[0], 'tipTip');
+
 							if (!opts.keepAlive) {
 								deactive_tiptip();
 							}
 							else if (!opts.hideOnClick) {
 
 								// сейчас данные уже обновились
-								$.data(obj[0], 'tipTip').holder.one('mouseleave.tipTip', function () {
-									deactive_tiptip();
-								});
+								if (data && data.holder) {
+									$.data(obj[0], 'tipTip').holder.one('mouseleave.tipTip', function () {
+										deactive_tiptip();
+									});
+								};
 							};
 						});
 					};
@@ -352,7 +360,7 @@
 					
 					// не скрываем Тип, если на него навели
 					// или вернулись на родителя
-					if (data.holder) {
+					if (data && data.holder) {
 						data.holder.off('.tipTip-deactive');
 						data.holder.on('mouseenter.tipTip-deactive', function() {
 							clearTimeout(timeoutHide);
@@ -373,7 +381,7 @@
 			function hide_tiptip (cb) {
 				var data = $.data(obj[0], 'tipTip');
 
-				if (data.holder) {
+				if (data && data.holder) {
 					data.holder.fadeOut(opts.fadeOut, function(){
 						data.holder.data().tipTip.isActive = false;
 						data.holder.removeClass('TipTip--is-active');
@@ -394,7 +402,7 @@
 				hide_tiptip(function () {
 					var data = $.data(obj[0], 'tipTip');
 
-					if (data.holder) {
+					if (data && data.holder) {
 						data.holder.remove();
 					};
 
