@@ -4,7 +4,7 @@
  *
  * Modified by: Sergei Vasilev (https://github.com/Ser-Gen/TipTip)
  *
- * Version 1.7.2
+ * Version 1.7.3
  *
  * This TipTip jQuery plug-in is dual licensed under the MIT and GPL licenses:
  *   http://www.opensource.org/licenses/mit-license.php
@@ -465,27 +465,67 @@
 				var is_rtl = opts.detectTextDir && isRtlText(data.content.text());
 
 				function moveTop() {
+					var pos = getPosTop();
+
+					tip_top = pos.top;
+					tip_left = pos.left;
+
 					tip_class = tip_classes.top;
-					tip_top = obj_top - tip_height - opts.edgeOffset - (arrow_height / 2);
-					tip_left = obj_left + ((obj_width - tip_width) / 2);
+				};
+
+				function getPosTop () {
+					return {
+						top: obj_top - tip_height - opts.edgeOffset - (arrow_height / 2),
+						left: obj_left + ((obj_width - tip_width) / 2)
+					};
 				};
 
 				function moveBottom() {
+					var pos = getPosBottom();
+
+					tip_top = pos.top;
+					tip_left = pos.left;
+
 					tip_class = tip_classes.bottom;
-					tip_top = obj_top + obj_height + opts.edgeOffset + (arrow_height / 2);
-					tip_left = obj_left + ((obj_width - tip_width) / 2);
+				};
+
+				function getPosBottom () {
+					return {
+						top: obj_top + obj_height + opts.edgeOffset + (arrow_height / 2),
+						left: obj_left + ((obj_width - tip_width) / 2)
+					};
 				};
 
 				function moveLeft() {
+					var pos = getPosLeft();
+
+					tip_top = pos.top;
+					tip_left = pos.left;
+
 					tip_class = tip_classes.left;
-					tip_top = obj_top + ((obj_height - tip_height) / 2);
-					tip_left = obj_left - tip_width - opts.edgeOffset - (arrow_width / 2);
+				};
+
+				function getPosLeft () {
+					return {
+						top: obj_top + ((obj_height - tip_height) / 2),
+						left: obj_left - tip_width - opts.edgeOffset - (arrow_width / 2)
+					};
 				};
 
 				function moveRight() {
+					var pos = getPosRight();
+
+					tip_top = pos.top;
+					tip_left = pos.left;
+
 					tip_class = tip_classes.right;
-					tip_top = obj_top + ((obj_height - tip_height) / 2);
-					tip_left = obj_left + obj_width + opts.edgeOffset;
+				};
+
+				function getPosRight () {
+					return {
+						top: obj_top + ((obj_height - tip_height) / 2),
+						left: obj_left + obj_width + opts.edgeOffset
+					};
 				};
 
 				// вычисляем положение Типа
@@ -525,7 +565,7 @@
 						else if (tip_class == tip_classes.left && is_rtl && tip_left - tip_width < win_left) {
 							moveRight();
 						}
-						else if (tip_class == tip_classes.right && !is_rtl && tip_left > win_left + win_width) {
+						else if (tip_class == tip_classes.right && !is_rtl && tip_left + tip_width > win_left + win_width) {
 							moveLeft();
 						}
 						else if (tip_class == tip_classes.right && is_rtl && tip_left + tip_width > win_left + win_width) {
@@ -534,7 +574,7 @@
 						else if (tip_class == tip_classes.top && tip_top < win_top) {
 							moveBottom();
 						}
-						else if (tip_class == tip_classes.bottom && tip_top + tip_height > win_top + win_height) {
+						else if (tip_class == tip_classes.bottom && tip_top + tip_height > win_top + win_height && getPosTop().top > win_top) {
 							moveTop();
 						};
 					};
@@ -551,6 +591,7 @@
 
 							// если нижняя сторона Типа выходит за нижнюю сторону области просмотра
 							if (tip_top + tip_height > win_height + win_top) {
+								
 								// выравниваем их
 								tip_top = obj_top + obj_height > win_height + win_top ? obj_top + obj_height - tip_height : win_height + win_top - tip_height - 4;
 							}
@@ -580,6 +621,11 @@
 								tip_left = obj_left < win_left ? obj_left : win_left + 4;
 							};
 						};
+
+						// тип не должен выдвигаться за границу экрана
+						if (tip_top < 0) { tip_top = 0; };
+						if (tip_left < 0 && !is_rtl) { tip_left = 0; };
+						// if (tip_left + tip_width < 0 && is_rtl) { tip_left + tip_width = 0; };
 					};
 
 				};
