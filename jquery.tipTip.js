@@ -625,7 +625,6 @@
 						// тип не должен выдвигаться за границу экрана
 						if (tip_top < 0) { tip_top = 0; };
 						if (tip_left < 0 && !is_rtl) { tip_left = 0; };
-						// if (tip_left + tip_width < 0 && is_rtl) { tip_left + tip_width = 0; };
 					};
 
 				};
