@@ -4,7 +4,7 @@
  *
  * Modified by: Sergei Vasilev (https://github.com/Ser-Gen/TipTip)
  *
- * Version 1.7.3
+ * Version 1.7.4
  *
  * This TipTip jQuery plug-in is dual licensed under the MIT and GPL licenses:
  *   http://www.opensource.org/licenses/mit-license.php
@@ -67,14 +67,6 @@
 			var timeoutHover = false;
 			var timeoutHide = false;
 
-			if (!!data) {
-				data['options'] = opts;
-			}
-			else {
-				data = { 'options': opts };
-			};
-			$.data(obj[0], 'tipTip', data);
-
 			// если нет указанного контейнера
 			if (!$(opts.container).length) {
 				opts.container = 'body';
@@ -121,8 +113,19 @@
 			}
 			else {
 
-				$.data(obj[0], 'tipTip', { options: opts });
+				// елси тип уже был инициализирован
+				if (data && data.options) {
+					return;
+				}
+				else {
+					data = { 'options': opts };
+				};
+			
+				// записываем данные
+				$.data(obj[0], 'tipTip', data);
 
+				// назначаем обработчики
+				// в зависимости от способа активации
 				if (opts.activation == 'hover') {
 					obj.on('mouseenter.tipTip', function () {
 						if (opts.delayHover) {
@@ -235,7 +238,7 @@
 			function active_tiptip () {
 				var data = $.data(obj[0], 'tipTip');
 
-				if (opts.enter.call(obj, data) === false || obj.hasClass(opts.objActiveClass)) {
+				if (!data || opts.enter.call(obj, data) === false || obj.hasClass(opts.objActiveClass)) {
 					return;
 				};
 
@@ -281,12 +284,13 @@
 						org_title = $.isFunction(opts.content) ? opts.content.call(obj, data) : opts.content;
 					};
 
-					// не отображать Тип, если нет содержимого
-					if (!org_title) {
-						return;
-					};
-
+					// записываем содержимое
 					data.content.html(org_title);
+				};
+
+				// не отображать Тип, если нет содержимого
+				if (!data.content.html()) {
+					return;
 				};
 
 				data.holder.hide().removeAttr('class').css({
@@ -298,6 +302,7 @@
 				var close = data.content.find('.TipTip__close');
 
 				if (close.length) {
+					close.off('click.tipTip');
 					close.on('click.tipTip', function(e) {
 						e.preventDefault();
 
@@ -337,7 +342,7 @@
 			function deactive_tiptip (delay) {
 				var data = $.data(obj[0], 'tipTip');
 
-				if (opts.exit.call(obj, data) === false) {
+				if (!data || opts.exit.call(obj, data) === false) {
 					return;
 				};
 
@@ -418,7 +423,7 @@
 				// в этой ситуации Тип уничтожен
 				// проверка нужна, потому что для уничтоженного также будет производиться пересчёт положения при изменении размеров области просмотра
 				// и позиционировать нужно только те, которые активны
-				if (!data || !data.holder || !data.holder.hasClass('TipTip--is-active')) { return false; };
+				if (!data || !data.holder || !data.holder.hasClass('TipTip--is-active')) { return; };
 
 				var obj_offset = obj.offset();
 				var obj_top = obj_offset.top;
