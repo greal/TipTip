@@ -64,10 +64,13 @@ body {
 <span class="test--usual" title="Способов активации несколько" data-tip-tip='{"defaultPosition":"left","theme":"black","activation":"click","keepAlive":true,"hideOnClick":true,"delay":"100","fadeIn":"100"}'>По нажатию</span>
 <span class="test--usual" title="Этот текст выведется стандартно" data-tip-tip='{"activation":"click","keepAlive":true,"hideOnClick":true,"delay":"100","fadeIn":"100","maxWidth":500,"preserveDirection":true}'>
 	По нажатию с закрытием
-	<span class="TipTip__donor">
+	<span class="TipTip__donor js-changeDonorTarget">
 		<a href="#" class="TipTip__close">Закрыть</a>
 		<strong style="display: block; width: 500px;">Содержимое подгружается из элемента внутри родителя с функциональностью Типа</strong>
 		<span>Может быть полезным в случае сложной разметки содержимого типа. Элемент-донор скрывается стилями.</span>
+		<span style="display: block;">
+			<a href="#" class="js-changeDonor">Изменить донора</a>
+		</span>
 	</span>
 </span>
 <span class="test--extended" data-tip-tip='{"defaultPosition":"bottom","theme":"black", "content": "Можно придумывать свои способы поведения при взаимодействии"}'>По нажатию дополнительно</span>
@@ -105,7 +108,7 @@ body {
 <script>
 
 // задаём глобальные настройки
-var tipTip = {
+$.fn.tipTip.defaults = {
 	theme: 'white',
 	hideOthers: false
 };
@@ -119,15 +122,22 @@ $('.test--usual').each(function () {
 	$(this).tipTip();
 });
 
- // добавляем Тип с нужным текстом элементу
-$('.test--manual').tipTip({
+// добавляем Тип с нужным текстом элементу
+var manual = $('.test--manual');
+
+manual.tipTip({
 	content: 'Добавлять Тип и управлять его поведением можно из скрипта',
 	activation: 'manual',
 	defaultPosition: 'left'
 }).tipTip('show'); // это программно отобразит применённый Тип без взаимодействия с ним
 
 setTimeout(function () {
-	$('.test--manual').tipTip('destroy');
+	manual
+		.tipTip('content', function (content) {
+			content.html('Можно даже динамически заменять его содержимое');
+		})
+		.html('Смена!')
+		.tipTip('position');
 }, 2000)
 
 
@@ -158,6 +168,12 @@ $('.test--extended').click(function() {
 		obj.tipTip('show');
 		obj.data().tipTip.holder.data().tipTip.obj.html('Тип был активирован');
 	};
+});
+
+$(document).on('click', '.js-changeDonor', function (e) {
+	e.preventDefault();
+
+	$('.js-changeDonorTarget').html('kek');
 });
 
 </script>
