@@ -4,7 +4,7 @@
  *
  * Modified by: Sergei Vasilev (https://github.com/Ser-Gen/TipTip)
  *
- * Version 1.7.4
+ * Version 1.8.0
  *
  * This TipTip jQuery plug-in is dual licensed under the MIT and GPL licenses:
  *   http://www.opensource.org/licenses/mit-license.php
@@ -49,6 +49,7 @@
 			
 			detectTextDir: false // автоматическое определение правостороннего текста, немного замедляет работу
 		};
+		var args = arguments;
 
 		return this.each(function () {
 
@@ -56,40 +57,23 @@
 			var obj = $(this);
 
 			var data = $.data(obj[0], 'tipTip');
+
+			// получаем настройки
 			var opts = data && data.options || $.extend(
 				{},
 				defaults, // по умолчанию
-				window.tipTip || {}, // глобальные
+				$.fn.tipTip.defaults, // глобальные в пространстве плагина
+				window.tipTip || {}, // глобальные совсем
 				options, // переданные при инициализации
 				obj.data('tipTip') || {} // из атрибута, самый большой приоритет
 			);
-			var timeout = false;
-			var timeoutHover = false;
-			var timeoutHide = false;
+			var timeout = null;
+			var timeoutHover = null;
+			var timeoutHide = null;
 
 			// если нет указанного контейнера
 			if (!$(opts.container).length) {
 				opts.container = 'body';
-			};
-
-			// если нет содержимого, установленного напрямую, и функции, возвращаемой содержимое
-			if (!opts.content && !$.isFunction(opts.content)) {
-
-				// если есть нужный идентификатор и элемент-донор
-				var tiptip_donor = obj.find('.TipTip__donor');
-
-				if (tiptip_donor.length) {
-					opts.content = tiptip_donor.html();
-				}
-				else {
-
-					// иначе используем стандартный атрибут
-					// запоминаем и удаляем `opts.attribute`, чтобы браузер не отображал стандартную подсказку
-					opts.content = obj.attr(opts.attribute);
-					if (opts.attribute === 'title') {
-						obj.removeAttr(opts.attribute);
-					};
-				};
 			};
 
 			// принудительное отображение Типа
@@ -111,9 +95,23 @@
 			else if (options === 'position') {
 				position_tiptip();
 			}
+
+			// работа с содержимым
+			else if (options === 'content') {
+				var data = $.data(obj.eq(0).get(0), 'tipTip');
+
+				if (args[1]) {
+					args[1](data.holder.children('.TipTip__content'), obj);
+				}
+				else {
+					return obj;
+				};
+			}
+
+			// инициализируем тип
 			else {
 
-				// елси тип уже был инициализирован
+				// если тип уже был инициализирован
 				if (data && data.options) {
 					return;
 				}
@@ -275,17 +273,39 @@
 					else {
 						$(window).on('scroll.tipTip', position_tiptip);
 					};
+				};
 
-					// получаем текст и добавляем в `data.content`
-					var org_title;
+				// получаем текущее содержимое
+				var content = data.content.html();
 
-					// даже если напрямую содержимое не устанавливается, уже использовался атрибут
-					if (opts.content) {
-						org_title = $.isFunction(opts.content) ? opts.content.call(obj, data) : opts.content;
+				// если есть элемент-донор
+				var tiptip_donor = obj.find('.TipTip__donor');
+
+				if (tiptip_donor.length) {
+					opts.content = tiptip_donor.html();
+				}
+
+				// если в поле содержимого передана функция
+				else if ($.isFunction(opts.content)) {
+					opts.content.call(obj, data);
+				}
+
+				// иначе используем стандартный атрибут
+				else {
+
+					// запоминаем и удаляем `title`, чтобы браузер не отображал стандартную подсказку
+					if (obj.attr(opts.attribute)) {
+						opts.content = obj.attr(opts.attribute);
+
+						if (opts.attribute === 'title') {
+							obj.removeAttr(opts.attribute);
+						};
 					};
+				};
 
-					// записываем содержимое
-					data.content.html(org_title);
+				// записываем содержимое, если оно обновилось
+				if (opts.content !== content) {
+					data.content.html(opts.content || content);
 				};
 
 				// не отображать Тип, если нет содержимого
@@ -456,9 +476,9 @@
 
 				if (opts.container !== 'body') {
 					var container_offset = data.container.offset();
-					var obj_top = obj_offset.top - container_offset.top;
-					var obj_left = obj_offset.left - container_offset.left;
 
+					obj_top = obj_offset.top - container_offset.top;
+					obj_left = obj_offset.left - container_offset.left;
 					wrap = $(opts.container);
 				};
 
