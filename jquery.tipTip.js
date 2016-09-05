@@ -4,7 +4,7 @@
  *
  * Modified by: Sergei Vasilev (https://github.com/Ser-Gen/TipTip)
  *
- * Version 1.8.0
+ * Version 1.8.1
  *
  * This TipTip jQuery plug-in is dual licensed under the MIT and GPL licenses:
  *   http://www.opensource.org/licenses/mit-license.php
@@ -100,11 +100,9 @@
 			else if (options === 'content') {
 				var data = $.data(obj.eq(0).get(0), 'tipTip');
 
-				if (args[1]) {
+				// если нужные данные получены и передана функция
+				if (data && data.holder && args[1] && $.isFunction(args[1])) {
 					args[1](data.holder.children('.TipTip__content'), obj);
-				}
-				else {
-					return obj;
 				};
 			}
 
