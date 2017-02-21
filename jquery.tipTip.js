@@ -4,7 +4,7 @@
  *
  * Modified by: Sergei Vasilev (https://github.com/Ser-Gen/TipTip)
  *
- * Version 1.8.1
+ * Version 1.8.2
  *
  * This TipTip jQuery plug-in is dual licensed under the MIT and GPL licenses:
  *   http://www.opensource.org/licenses/mit-license.php
@@ -346,14 +346,26 @@
 					clearTimeout(timeoutHide);
 				};
 
+				// таймер отображения
 				timeout = setTimeout(function () {
-					data.holder.data().tipTip.isActive = true;
-					data.holder.stop(true, true).fadeIn(opts.fadeIn);
+					if (data && data.holder) {
+
+						// проявляем Тип
+						data.holder.stop(true, true).fadeIn(opts.fadeIn, function () {
+
+							// вызываем функцию
+							opts.afterEnter.call(obj, data);
+						});
+
+						// сохраняем состояние
+						if (data.holder.data() && data.holder.data().tipTip) {
+							data.holder.data().tipTip.isActive = true;
+						};
+					};
 				}, opts.delay);
 
+				// добавляем класс активности родителю
 				obj.addClass(opts.objActiveClass);
-
-				opts.afterEnter.call(obj, data);
 			};
 
 			// отключение Типа
