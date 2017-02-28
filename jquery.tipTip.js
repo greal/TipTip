@@ -4,7 +4,7 @@
  *
  * Modified by: Sergei Vasilev (https://github.com/Ser-Gen/TipTip)
  *
- * Version 1.8.2
+ * Version 1.8.3
  *
  * This TipTip jQuery plug-in is dual licensed under the MIT and GPL licenses:
  *   http://www.opensource.org/licenses/mit-license.php
@@ -100,9 +100,20 @@
 			else if (options === 'content') {
 				var data = $.data(obj.eq(0).get(0), 'tipTip');
 
-				// если нужные данные получены и передана функция
-				if (data && data.holder && args[1] && $.isFunction(args[1])) {
-					args[1](data.holder.children('.TipTip__content'), obj);
+				if (data && args[1]) {
+					if ($.type(args[1]) === 'function') {
+						if (data.content) {
+							args[1](data.content, obj);
+						};
+					}
+					else if ($.type(args[1]) === 'string') {
+						if (data.content) {
+							data.content.html(args[1]);
+						}
+						else if (data.options && data.options.content) {
+							data.options.content = args[1];
+						};
+					};
 				};
 			}
 
@@ -358,8 +369,14 @@
 						});
 
 						// сохраняем состояние
-						if (data.holder.data() && data.holder.data().tipTip) {
-							data.holder.data().tipTip.isActive = true;
+						if (data.holder.data()) {
+							var dataTip = data.holder.data().tipTip;
+
+							if (!dataTip || typeof dataTip.isActive === 'undefined') {
+								return;
+							};
+
+							dataTip.isActive = true;
 						};
 					};
 				}, opts.delay);
@@ -417,7 +434,13 @@
 				var data = $.data(obj[0], 'tipTip');
 
 				if (data && data.holder) {
-					data.holder.fadeOut(opts.fadeOut, function(){
+					data.holder.fadeOut(opts.fadeOut, function () {
+						if (!data || !data.holder || !data.holder.data()) { return; };
+
+						var dataTip = data.holder.data().tipTip;
+
+						if (!dataTip || typeof dataTip.isActive === 'undefined') { return; };
+
 						data.holder.data().tipTip.isActive = false;
 						data.holder.removeClass('TipTip--is-active');
 					
