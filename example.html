@@ -129,16 +129,22 @@ manual.tipTip({
 	content: 'Добавлять Тип и управлять его поведением можно из скрипта',
 	activation: 'manual',
 	defaultPosition: 'left'
-}).tipTip('show'); // это программно отобразит применённый Тип без взаимодействия с ним
+}); // это программно отобразит применённый Тип без взаимодействия с ним
 
 setTimeout(function () {
 	manual
-		.tipTip('content', function (content) {
-			content.html('Можно даже динамически заменять его содержимое');
-		})
+		.tipTip('content', 'Можно даже динамически заменять его содержимое')
 		.html('Смена!')
-		.tipTip('position');
-}, 2000)
+		.tipTip('position').tipTip('show');
+	
+	setTimeout(function () {
+		manual
+			.tipTip('content', function (content, target) {
+				content.html('И ещё одна замена!');
+				target.html('Смена ещё!').tipTip('position');
+			});
+	}, 2000);
+}, 2000);
 
 
 // полностью программно создаваемый тип
