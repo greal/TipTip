@@ -4,7 +4,7 @@
  *
  * Modified by: Sergei Vasilev (https://github.com/Ser-Gen/TipTip)
  *
- * Version 1.8.3
+ * Version 1.8.4
  *
  * This TipTip jQuery plug-in is dual licensed under the MIT and GPL licenses:
  *   http://www.opensource.org/licenses/mit-license.php
@@ -76,6 +76,17 @@
 				opts.container = 'body';
 			};
 
+			// если нет содержимого, установленного напрямую
+			if (opts.content === false) {
+
+				// запоминаем и удаляем `opts.attribute`,
+				// чтобы браузер не отображал стандартную подсказку
+				opts.content = obj.attr(opts.attribute);
+				if (opts.attribute === 'title') {
+					obj.removeAttr(opts.attribute);
+				};
+			};
+
 			// принудительное отображение Типа
 			if (options === 'show') {
 				active_tiptip();
@@ -110,8 +121,8 @@
 						if (data.content) {
 							data.content.html(args[1]);
 						}
-						else if (data.options && data.options.content) {
-							data.options.content = args[1];
+						else if (data.options) {
+							data.options._majorContent = args[1];
 						};
 					};
 				};
@@ -284,37 +295,48 @@
 					};
 				};
 
-				// получаем текущее содержимое
+				// ищем содержимое
+				var computedContent;
 				var content = data.content.html();
 
-				// если есть элемент-донор
-				var tiptip_donor = obj.find('.TipTip__donor');
-
-				if (tiptip_donor.length) {
-					opts.content = tiptip_donor.html();
-				}
-
-				// если в поле содержимого передана функция
-				else if ($.isFunction(opts.content)) {
-					opts.content.call(obj, data);
-				}
-
-				// иначе используем стандартный атрибут
-				else {
-
-					// запоминаем и удаляем `title`, чтобы браузер не отображал стандартную подсказку
-					if (obj.attr(opts.attribute)) {
-						opts.content = obj.attr(opts.attribute);
-
-						if (opts.attribute === 'title') {
-							obj.removeAttr(opts.attribute);
-						};
-					};
+				// если содержимое изменилось извне
+				if (content && content !== data._content) {
+					opts._majorContent = content;
 				};
 
-				// записываем содержимое, если оно обновилось
-				if (opts.content !== content) {
-					data.content.html(opts.content || content);
+				// если содержимое выставлено принудительно
+				if (opts._majorContent) {
+
+					// сохраняем новое содержимое
+					if (opts._majorContent !== data._content) {
+						data.content.html(opts._majorContent);
+						data._content = opts._majorContent;
+					};
+				}
+				else {
+
+					// если есть элемент-донор
+					var tiptip_donor = obj.find('.TipTip__donor');
+
+					if (tiptip_donor.length) {
+						computedContent = tiptip_donor.html();
+					}
+
+					// если передана строка
+					else if ($.type(opts.content) === 'string') {
+						computedContent = opts.content;
+					}
+
+					// если в поле содержимого передана функция
+					else if ($.isFunction(opts.content)) {
+						computedContent = opts.content.call(obj, data);
+					};
+
+					// если вычислилось другое содержимое
+					if (computedContent && computedContent !== data._content) {
+						data.content.html(computedContent);
+						data._content = computedContent;
+					};
 				};
 
 				// не отображать Тип, если нет содержимого
@@ -439,9 +461,9 @@
 
 						var dataTip = data.holder.data().tipTip;
 
-						if (!dataTip || typeof dataTip.isActive === 'undefined') { return; };
+						if (!dataTip) { return; };
 
-						data.holder.data().tipTip.isActive = false;
+						dataTip.isActive = false;
 						data.holder.removeClass('TipTip--is-active');
 					
 						// это должно происходить и когда Тип визуально скрыт или перемещён с помощью `active_tiptip()`
