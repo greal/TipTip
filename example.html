@@ -71,11 +71,15 @@ body {
 		<span style="display: block;">
 			<a href="#" class="js-changeDonor">Изменить донора</a>
 		</span>
+		<span style="display: block;">
+			<a href="#" class="js-changeContent">Изменить содержимое</a>
+		</span>
+		<span class="js-changeContentTarget"></span>
 	</span>
 </span>
 <span class="test--extended" data-tip-tip='{"defaultPosition":"bottom","theme":"black", "content": "Можно придумывать свои способы поведения при взаимодействии"}'>По нажатию дополнительно</span>
 <span class="test--hover" title="С задержанным скрытием. Тип останется активным в том числе при наведении на него и при возвращении к родителю">По наведению</span>
-<span class="test--conditional">Скрытие по нажатию</span>
+<span class="test--usual test--major" title="Это мы не увидим">Надёжная смена содержимого</span>
 
 
 <style>
@@ -181,6 +185,16 @@ $(document).on('click', '.js-changeDonor', function (e) {
 
 	$('.js-changeDonorTarget').html('kek');
 });
+
+$(document).on('click', '.js-changeContent', function (e) {
+	e.preventDefault();
+
+	$('.js-changeContentTarget').html('Дополнительное содержимое');
+});
+
+setTimeout(function () {
+	$('.test--major').tipTip('content', 'Важное содержимое');
+}, 1500);
 
 </script>
 
