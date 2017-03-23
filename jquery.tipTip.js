@@ -302,12 +302,14 @@
 				// если содержимое изменилось извне
 				if (content && content !== data._content) {
 					opts._majorContent = content;
+					data._content = content;
 				};
 
 				// если содержимое выставлено принудительно
 				if (opts._majorContent) {
 
 					// сохраняем новое содержимое
+					// если оно изменено до первого отображения
 					if (opts._majorContent !== data._content) {
 						data.content.html(opts._majorContent);
 						data._content = opts._majorContent;
