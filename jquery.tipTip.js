@@ -38,6 +38,7 @@
 
 			theme: 'black', // устанавливается тема, выбор из `black`, `alt`, `white` и `error`
 			cssClass: '', // класс будет добавлен типу перед его отображением
+			resetPaddingContent: false, // сбрасывает внутренний отступ в содержимом
 
 			objActiveClass: 'TipTip__active', // класс-маркер, чтобы облегчить определение родителя активного типа; будет удалён при помощи `deactive_tiptip()`
 			hideOthers: true, // скрывать ли другие типы при активации
@@ -367,6 +368,11 @@
 				opts.cssClass += ' TipTip TipTip--theme-'+ opts.theme;
 				data.holder.addClass(opts.cssClass);
 				data.holder.addClass('TipTip--is-active');
+
+				// сбрасываем внутренний отступ
+				if (opts.resetPaddingContent) {
+					data.holder.addClass('TipTip--resetPadding');
+				}
 
 				// определяем положение Типа
 				position_tiptip();
